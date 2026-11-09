@@ -1,0 +1,158 @@
+# ============================================================
+#  ManagerVK  -  configvk.yml
+# ============================================================
+#  Colors : legacy codes (&a, &2, &l ...) and hex (&#55FF55)
+#  Tokens : {prefix} {primary} {secondary} {muted} {highlight} {error}
+#           (taken from the "theme" section) plus per-message
+#           placeholders such as {player}, {mode}, {world}.
+#
+#  Changing "enabled", "command", "aliases" or permission nodes
+#  needs a server restart. Everything else applies instantly with
+#  /vkmanager reload
+# ============================================================
+
+# Green "Creeper" theme used by all ManagerVK messages
+theme:
+  prefix: "&2&lVK &8» "
+  primary: "&a"
+  secondary: "&2"
+  muted: "&7"
+  highlight: "&f"
+  error: "&c"
+
+# Shared messages
+messages:
+  no-permission: "{prefix}{error}You don't have permission to do that."
+  player-only: "{prefix}{error}This command can only be used by players."
+  player-not-found: "{prefix}{error}Player {highlight}{player}{error} is not online."
+
+# /vkmanager
+manager:
+  command: "vkmanager"
+  aliases: ["vkm"]
+  description: "ManagerVK admin command"
+  permission: "vkmanager.admin"
+  messages:
+    usage: "{prefix}{primary}Usage: {highlight}/{label} reload"
+    reloaded: "{prefix}{primary}Configuration reloaded."
+
+# /gamemode  (replaces the vanilla command with the green theme)
+gamemode:
+  enabled: true
+  command: "gamemode"
+  aliases: ["gm"]
+  description: "Change game mode"
+  permission: "vkmanager.gamemode"
+  permission-default: "op"          # true | false | op | notop
+  permission-others: "vkmanager.gamemode.others"
+  # What you can type after /gm  ->  game mode
+  shortcuts:
+    c: "CREATIVE"
+    s: "SURVIVAL"
+    sp: "SPECTATOR"
+    a: "ADVENTURE"
+    "0": "SURVIVAL"
+    "1": "CREATIVE"
+    "2": "ADVENTURE"
+    "3": "SPECTATOR"
+  # Display names used in messages
+  names:
+    survival: "Survival"
+    creative: "Creative"
+    adventure: "Adventure"
+    spectator: "Spectator"
+  messages:
+    usage: "{prefix}{primary}Usage: {highlight}/{label} <c|s|sp|a> [player]"
+    invalid-mode: "{prefix}{error}Unknown game mode: {highlight}{input}"
+    changed-self: "{prefix}{primary}Game mode set to {highlight}{mode}{primary}."
+    changed-other: "{prefix}{primary}Set {highlight}{player}{primary}'s game mode to {highlight}{mode}{primary}."
+    changed-by-other: "{prefix}{primary}Your game mode was set to {highlight}{mode}{primary} by {highlight}{sender}{primary}."
+
+# /tps  (replaces the vanilla/Paper command with the green theme)
+tps:
+  enabled: true
+  command: "tps"
+  aliases: []
+  description: "Show server performance"
+  permission: "vkmanager.tps"
+  permission-default: "true"
+  thresholds:
+    good: 18.0       # TPS at or above this uses the "good" color
+    medium: 15.0     # TPS at or above this uses the "medium" color, below is "bad"
+  colors:
+    good: "&a"
+    medium: "&e"
+    bad: "&c"
+  messages:
+    header: "{prefix}{secondary}&lServer Performance"
+    tps-line: "{prefix}{muted}TPS &8(1m, 5m, 15m){muted}: {tps1}{muted}, {tps5}{muted}, {tps15}"
+    mspt-line: "{prefix}{muted}MSPT: {primary}{mspt}{muted} ms/tick"
+
+# /effect  (replaces the vanilla command with the green theme)
+# Usage: /effect give <player> <effect> [seconds] [level]  |  /effect clear [player] [effect]
+effect:
+  enabled: true
+  command: "effect"
+  aliases: []
+  description: "Give or clear potion effects"
+  permission: "vkmanager.effect"
+  permission-default: "op"
+  default-duration: 30      # seconds
+  default-amplifier: 0      # 0 = level I
+  max-duration: 1000000     # seconds
+  hide-particles: false
+  messages:
+    usage: "{prefix}{primary}Usage: {highlight}/{label} give <player> <effect> [seconds] [level]{primary} or {highlight}/{label} clear [player] [effect]"
+    invalid-effect: "{prefix}{error}Unknown effect: {highlight}{effect}"
+    invalid-number: "{prefix}{error}Seconds must be above 0 and the level must be between 0 and 255."
+    given: "{prefix}{primary}Gave {highlight}{effect} {level}{primary} to {highlight}{player}{primary} for {highlight}{seconds}s{primary}."
+    given-target: "{prefix}{primary}You received {highlight}{effect} {level}{primary} for {highlight}{seconds}s{primary}."
+    cleared-all: "{prefix}{primary}Cleared all effects from {highlight}{player}{primary}."
+    cleared-one: "{prefix}{primary}Cleared {highlight}{effect}{primary} from {highlight}{player}{primary}."
+    cleared-target: "{prefix}{primary}Your effects were cleared by {highlight}{sender}{primary}."
+    no-effects: "{prefix}{error}{player} has no matching effects."
+
+lobby:
+  enabled: true
+  command: "lobby"
+  aliases: []
+  description: "Teleport to the lobby"
+  permission: "vkmanager.lobby"
+  permission-default: "true"
+
+  # Worlds where /lobby may be used. Leave empty ([]) to allow every world.
+  allowed-worlds:
+    - "survival"
+    - "world"
+    - "spawn"
+
+  destination:
+    world: "lobby"
+    x: 0.5
+    y: 100.0
+    z: 0.5
+    yaw: 0.0
+    pitch: 0.0
+
+  teleport:
+    delay: 3
+    cancel-on-move: true
+    bypass-permission: "vkmanager.lobby.bypass"   # skips the delay (op by default)
+
+  # /setlobby - saves your current position as the lobby destination
+  set:
+    enabled: true
+    command: "setlobby"
+    aliases: []
+    description: "Set the lobby location"
+    permission: "vkmanager.lobby.set"
+
+  messages:
+    teleporting: "&2&lVK &8» &aTeleporting to lobby..."
+    success: "&2&lVK &8» &aWelcome to the lobby!"
+    restricted-world: "&2&lVK &8» &cYou cannot use /lobby in this world!"
+    countdown: "&2&lVK &8» &7Stay still... &a{seconds}s"          # leave "" to disable
+    cancelled: "&2&lVK &8» &cTeleport cancelled because you moved."
+    already-teleporting: "&2&lVK &8» &cYou are already teleporting!"
+    not-configured: "&2&lVK &8» &cThe lobby world is not loaded or not configured."
+    set-success: "&2&lVK &8» &aLobby set to &f{world} {x} {y} {z}&a."

@@ -1,0 +1,6 @@
+name: ManagerVK
+version: '${version}'
+
+main: ir.gharri.managerVK.ManagerVK
+api-version: '1.21'
+load: POSTWORLD
