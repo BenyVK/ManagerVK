@@ -156,3 +156,42 @@ lobby:
     already-teleporting: "&2&lVK &8» &cYou are already teleporting!"
     not-configured: "&2&lVK &8» &cThe lobby world is not loaded or not configured."
     set-success: "&2&lVK &8» &aLobby set to &f{world} {x} {y} {z}&a."
+
+# /survive  (works only in the worlds listed in allowed-worlds, normally the lobby)
+# Sends the player to the survival world: back to where they last were there,
+# or to "first-time" if they have never been there. Positions are saved in survive-data.yml
+survive:
+  enabled: true
+  command: "survive"
+  aliases: []
+  description: "Teleport to the survival world"
+  permission: "vkmanager.survive"
+  permission-default: "true"
+
+  # Worlds where /survive may be used
+  allowed-worlds:
+    - "lobby"
+
+  # World the player is sent to
+  target-world: "world"
+
+  # Used when the player has never been in the target world
+  first-time:
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    yaw: 0.0
+    pitch: 0.0
+
+  teleport:
+    delay: 3
+    cancel-on-move: true
+
+  messages:
+    title: "{primary}&l{seconds}"                              # big number in the middle of the screen
+    subtitle: "{error}Don't move!"
+    success: "{prefix}{primary}Good luck out there!"
+    restricted-world: "{prefix}{error}You can only use /survive in the lobby!"
+    cancelled: "{prefix}{error}Teleport cancelled because you moved."
+    already-teleporting: "{prefix}{error}You are already teleporting!"
+    not-configured: "{prefix}{error}The survival world is not loaded or not configured."

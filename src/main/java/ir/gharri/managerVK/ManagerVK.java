@@ -5,6 +5,7 @@ import ir.gharri.managerVK.commands.GamemodeCommand;
 import ir.gharri.managerVK.commands.LobbyCommand;
 import ir.gharri.managerVK.commands.ManagerCommand;
 import ir.gharri.managerVK.commands.SetLobbyCommand;
+import ir.gharri.managerVK.commands.SurviveCommand;
 import ir.gharri.managerVK.commands.TpsCommand;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -38,6 +39,7 @@ public final class ManagerVK extends JavaPlugin {
     private File configFile;
     private FileConfiguration config;
     private Messages messages;
+    private SurviveTracker surviveTracker;
 
     private final Map<String, Command> installed = new LinkedHashMap<>();
     private final Map<String, Command> displaced = new HashMap<>();
@@ -52,11 +54,19 @@ public final class ManagerVK extends JavaPlugin {
         messages = new Messages(this);
         reloadConfigVK();
         registerPermissions();
+        if (config.getBoolean("survive.enabled", true)) {
+            surviveTracker = new SurviveTracker(this);
+            getServer().getPluginManager().registerEvents(surviveTracker, this);
+        }
+        getServer().getPluginManager().registerEvents(new CommandSuggestListener(getName()), this);
         registerCommands();
     }
 
     @Override
     public void onDisable() {
+        if (surviveTracker != null) {
+            surviveTracker.saveOnlinePlayers();
+        }
         try {
             Map<String, Command> known = getServer().getCommandMap().getKnownCommands();
             String prefix = getName().toLowerCase(Locale.ROOT);
@@ -119,6 +129,10 @@ public final class ManagerVK extends JavaPlugin {
         return messages;
     }
 
+    public SurviveTracker surviveTracker() {
+        return surviveTracker;
+    }
+
     /** Lobby destination from configvk.yml, or null when the world is missing. */
     public Location lobbyLocation() {
         ConfigurationSection s = config.getConfigurationSection("lobby.destination");
@@ -152,6 +166,7 @@ public final class ManagerVK extends JavaPlugin {
         perm("lobby.permission", "lobby.permission-default", "true", "Use /lobby");
         perm("lobby.teleport.bypass-permission", null, "op", "Skip the /lobby delay");
         perm("lobby.set.permission", null, "op", "Use /setlobby");
+        perm("survive.permission", "survive.permission-default", "true", "Use /survive");
     }
 
     private void perm(String nodePath, String defaultPath, String fallbackDefault, String description) {
@@ -193,6 +208,9 @@ public final class ManagerVK extends JavaPlugin {
             if (config.getBoolean("lobby.set.enabled", true)) {
                 install(new SetLobbyCommand(this));
             }
+        }
+        if (config.getBoolean("survive.enabled", true)) {
+            install(new SurviveCommand(this));
         }
     }
 
